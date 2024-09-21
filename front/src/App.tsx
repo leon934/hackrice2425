@@ -22,16 +22,20 @@ function App() {
   const [lastExtracted, setLastExtracted] = useState("")
   const [thinking, setThinking] = useState<boolean>(false)
   const [userLocation, setUserLocation] = useState<Location | null>(null)
+  const [zipCode, setZipCode] = useState<string>("")
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
       setUserLocation({ lat: position.coords.latitude, long: position.coords.longitude })
+      axios.get(`https://api.mapbox.com/search/geocode/v6/reverse?longitude=${position.coords.longitude}&latitude=${position.coords.latitude}&access_token=${import.meta.env.VITE_MAPBOX}`).then((res) => {
+        setZipCode(res.data.features[0].properties.context.postcode.name)
+      })
     });
 
   }, [])
 
   const handleSend = () => {
+    
     if (!input) return
-    console.log(input)
     const message : Message = {
       content: input,
       userType: 'user'
@@ -41,7 +45,7 @@ function App() {
     setInput("")
     setThinking(true);
     
-    extractFromInput(input, lastExtracted)
+    extractFromInput(input, messages.map((m) => m.content))
       .then((res) => {
         const message : Message = {
           content: res.response,
@@ -49,13 +53,19 @@ function App() {
         }
         setMessages(prev => [...prev, message])
         setLastExtracted(JSON.stringify(res))
+
+        if (res.valid) {
+          queryAPI({ ...res.extracted, zipCode }).then((_) => setThinking(false));
+          return;
+        }
+
         setThinking(false);
       })
     
   }
 
   const queryAPI = async (data: any) => {
-    axios.post('http://localhost:5000/api', data) // add the endpoint later
+    axios.post('http://localhost:5000/api/insuranceRequest', data) // add the endpoint later
       .then((res) => {
         console.log(res.data)
       })
