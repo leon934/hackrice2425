@@ -3,6 +3,7 @@ import './App.css'
 import { extractFromInput } from './model'
 import axios from 'axios';
 import MapComponent from './components/Map'
+import SearchBarComponent from './components/SearchBar'
 import { Box, Button, Input } from "@mui/joy"
 
 type Message = {
@@ -24,6 +25,7 @@ function App() {
   const [userLocation, setUserLocation] = useState<Location | null>(null)
   const [zipCode, setZipCode] = useState<string>("")
   useEffect(() => {
+    console.log(import.meta.env)
     navigator.geolocation.getCurrentPosition((position) => {
       setUserLocation({ lat: position.coords.latitude, long: position.coords.longitude })
       axios.get(`https://api.mapbox.com/search/geocode/v6/reverse?longitude=${position.coords.longitude}&latitude=${position.coords.latitude}&access_token=${import.meta.env.VITE_MAPBOX}`).then((res) => {
@@ -75,8 +77,9 @@ function App() {
   return (
     <div style={{ display: "flex", overflow: "hidden" }}>
       <div style={{ width: "75vw", height: "100vh" }}>{userLocation && <MapComponent lat={userLocation.lat} long={userLocation.long} />}</div>
+      <div> <SearchBarComponent /></div>
       <div style={{ width: "25vw", height: "100vh" }}>
-        <h1>Ensurance</h1>
+        <h1>Insurance</h1>
         <div className="chat-container">
           {messages.map((message, index) => {
             return <div
