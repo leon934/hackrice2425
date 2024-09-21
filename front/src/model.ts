@@ -1,0 +1,36 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const genai = new GoogleGenerativeAI("AIzaSyBIh_8ehl6eiYtGueW7ruejn3OtAstD5x4")
+const model = genai.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" }})
+
+const extractFromInput = async (input: string, last_response: string) => {
+
+    const prompt = `You are a helpful, friendly chatbot that takes input then extract the natural language input of the user in order to provide an insurance plan lookup based on the user prefereces. You want to ask the user to ensure that all the required fields are answered, and obviously let the user know if you have all the requirements. The user's just said: ${input}. 
+    Your last extraction result was: ${last_response}. O
+    utput the extracted base on this JSON schema:
+        Information = {
+            age: number, required,
+            gender: boolean, required (true for male or false for female)
+            weight: number, required
+            weight_unit: string, required (kg or lbs)
+            height: number, required
+            height_unit: string, required (cm or ft)
+            dependents: number, required
+        }
+
+        Return: Response = {
+            extracted: Information,
+            response: string (your response to the user, be helpful and friendly, stay aware of what they're saying),
+            valid: boolean (if all the required fields are answered)
+        }
+
+    `;
+
+    const res = await model.generateContent(prompt);
+
+    console.log((res.response.text()));
+
+    return JSON.parse(res.response.text());
+}
+
+export { extractFromInput }

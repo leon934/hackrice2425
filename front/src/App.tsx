@@ -1,33 +1,82 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useRef } from 'react'
 import './App.css'
+import { extractFromInput } from './model'
+import axios from 'axios';
+
+type Message = {
+  content: string
+  userType: 'user' | 'bot'
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [messages, setMessages] = useState<Message[]>([])
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [lastExtracted, setLastExtracted] = useState("")
+  const [thinking, setThinking] = useState<boolean>(false)
+
+  const handleSend = () => {
+    if (!inputRef.current || !inputRef.current.value) return
+
+    const message : Message = {
+      content: inputRef.current?.value,
+      userType: 'user'
+    }
+    setMessages(prev => [...prev, message])
+    setThinking(true);
+    extractFromInput(inputRef.current.value, lastExtracted)
+      .then((res) => {
+        const message : Message = {
+          content: res.response,
+          userType: 'bot'
+        }
+        setMessages(prev => [...prev, message])
+        setLastExtracted(JSON.stringify(res))
+        setThinking(false);
+      })
+  }
+
+  const queryAPI = async (data: any) => {
+    axios.post('http://localhost:5000/api', data) // add the endpoint later
+      .then((res) => {
+        console.log(res.data)
+      })
+
+  }
 
   return (
     <>
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <h1>Chatbot</h1>
+        <div className="chat-container">
+          {messages.map((message, index) => (
+            <div
+              key={index}
+              className={"message " + message.userType}
+            >
+              {message.content}
+            </div>
+          ))}
+          { thinking && <div className='dots'>Thinking...</div>}
+        </div>
+        <div>
+          <input
+            type="text"
+            className="inputBox"
+            placeholder="Type a message..."
+            ref={inputRef}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSend()
+                inputRef.current!.value = ''
+              }
+            }}
+          />
+          <button className="" onClick={() => {
+            handleSend()
+            inputRef.current!.value = ''
+          }}>Send</button>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
