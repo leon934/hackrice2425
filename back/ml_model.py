@@ -38,8 +38,8 @@ def build_model(dataset):
 
     print(type(onnx_file))
 
-    with open("etr_model.onnx", "wb") as file:
-        file.write(onnx_file.SerializeToString())
+    # with open("etr_model.onnx", "wb") as file:
+    #     file.write(onnx_file.SerializeToString())
 
     return etr, x_test, y_test
 
@@ -62,13 +62,13 @@ def test_onnx(onnx_filepath, x_test_sample):
     output_name = ortf.get_outputs()[0].name
 
     prediction = ortf.run([output_name], {input_name: x_test_sample.astype(np.float32)})[0]
-
+    print(input_name.split(" "))
     print(f"ONNX model prediction: {prediction}")
 
     return prediction
 
 def main():
-    dataset_directory = r"C:\Users\leonl\Documents\GitHub\hackrice2425\back\insurance.csv"
+    dataset_directory = "./insurance.csv"
 
     model, x_test, y_test = build_model(dataset_directory)
 

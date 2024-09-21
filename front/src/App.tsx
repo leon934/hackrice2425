@@ -4,6 +4,7 @@ import { extractFromInput } from './model'
 import axios from 'axios';
 import MapComponent from './components/Map'
 import { Box, Button, Input } from "@mui/joy"
+import { v4 } from 'uuid'
 
 type Message = {
   content: string
@@ -23,11 +24,27 @@ function App() {
   const [thinking, setThinking] = useState<boolean>(false)
   const [userLocation, setUserLocation] = useState<Location | null>(null)
   const [zipCode, setZipCode] = useState<string>("")
+  const [hospitals, setHospitals] = useState<any[]>([])
+
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
       setUserLocation({ lat: position.coords.latitude, long: position.coords.longitude })
       axios.get(`https://api.mapbox.com/search/geocode/v6/reverse?longitude=${position.coords.longitude}&latitude=${position.coords.latitude}&access_token=${import.meta.env.VITE_MAPBOX}`).then((res) => {
         setZipCode(res.data.features[0].properties.context.postcode.name)
+        axios.get(`https://api.mapbox.com/search/searchbox/v1/suggest?q=hospital&proximity=${position.coords.longitude},${position.coords.latitude}&limit=10&session_token=${v4()}&access_token=` + import.meta.env.VITE_MAPBOX).then((res) => {
+          setHospitals(res.data.suggestions.map(async (suggestion: any) => {
+            if (!suggestion.context) return
+
+            // axios.get(`https://api.mapbox.com/search/geocode/v6/forward?q=${suggestion.context["full_address"]}&access_token=${import.meta.env.VITE_MAPBOX}`).then((res) => {
+            //   return {
+            //     name: suggestion.name,
+            //     lat: res,
+            //     long: suggestion.context[0]
+            //   }
+            // })
+
+          }))
+        })
       })
     });
 
@@ -45,7 +62,7 @@ function App() {
     setInput("")
     setThinking(true);
     
-    extractFromInput(input, messages.map((m) => m.content))
+    extractFromInput(input, messages.map((m) => m.content), lastExtracted)
       .then((res) => {
         const message : Message = {
           content: res.response,
@@ -65,7 +82,7 @@ function App() {
   }
 
   const queryAPI = async (data: any) => {
-    axios.post('http://localhost:5000/api/insuranceRequest', data) // add the endpoint later
+    axios.post('http://localhost:5000/api/insuranceRequest', data)
       .then((res) => {
         console.log(res.data)
       })
@@ -74,7 +91,7 @@ function App() {
 
   return (
     <div style={{ display: "flex", overflow: "hidden" }}>
-      <div style={{ width: "75vw", height: "100vh" }}>{userLocation && <MapComponent lat={userLocation.lat} long={userLocation.long} />}</div>
+      <div style={{ width: "75vw", height: "100vh" }}>{userLocation && <MapComponent lat={userLocation.lat} long={userLocation.long} hospitals={hospitals} />}</div>
       <div style={{ width: "25vw", height: "100vh" }}>
         <h1>Ensurance</h1>
         <div className="chat-container">

@@ -6,3 +6,5 @@ skl2onnx
 onnxruntime
 numpy
 pandas
+google-generativeai
+python-dotenv
