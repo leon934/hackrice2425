@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+
 const genai = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI as string);
 const model = genai.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" }})
 
