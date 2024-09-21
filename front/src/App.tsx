@@ -1,29 +1,47 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import './App.css'
 import { extractFromInput } from './model'
 import axios from 'axios';
+import MapComponent from './components/Map'
+import { Box, Button, Input } from "@mui/joy"
 
 type Message = {
   content: string
   userType: 'user' | 'bot'
+  data?: any
+}
+
+type Location = {
+  lat: number,
+  long: number
 }
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([])
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [input, setInput] = useState<string>("")
   const [lastExtracted, setLastExtracted] = useState("")
   const [thinking, setThinking] = useState<boolean>(false)
+  const [userLocation, setUserLocation] = useState<Location | null>(null)
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      setUserLocation({ lat: position.coords.latitude, long: position.coords.longitude })
+    });
+
+  }, [])
 
   const handleSend = () => {
-    if (!inputRef.current || !inputRef.current.value) return
-
+    if (!input) return
+    console.log(input)
     const message : Message = {
-      content: inputRef.current?.value,
+      content: input,
       userType: 'user'
     }
+
     setMessages(prev => [...prev, message])
+    setInput("")
     setThinking(true);
-    extractFromInput(inputRef.current.value, lastExtracted)
+    
+    extractFromInput(input, lastExtracted)
       .then((res) => {
         const message : Message = {
           content: res.response,
@@ -33,6 +51,7 @@ function App() {
         setLastExtracted(JSON.stringify(res))
         setThinking(false);
       })
+    
   }
 
   const queryAPI = async (data: any) => {
@@ -44,40 +63,47 @@ function App() {
   }
 
   return (
-    <>
-      <div>
-        <h1>Chatbot</h1>
+    <div style={{ display: "flex", overflow: "hidden" }}>
+      <div style={{ width: "75vw", height: "100vh" }}>{userLocation && <MapComponent lat={userLocation.lat} long={userLocation.long} />}</div>
+      <div style={{ width: "25vw", height: "100vh" }}>
+        <h1>Ensurance</h1>
         <div className="chat-container">
-          {messages.map((message, index) => (
-            <div
+          {messages.map((message, index) => {
+            return <div
               key={index}
               className={"message " + message.userType}
             >
               {message.content}
             </div>
-          ))}
+          })}
           { thinking && <div className='dots'>Thinking...</div>}
         </div>
-        <div>
-          <input
-            type="text"
-            className="inputBox"
+        <Box
+          sx={{ display: "flex", width: "100%", justifyContent: "center" }}  
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSend()
+            }
+          }}
+        >
+          <Input
+            endDecorator={<Button onClick={() => {
+              handleSend()
+            }}>Send</Button>}
+            sx={{
+              width: "80%",
+            }}
+            variant='plain'
+            size="lg"
+            value={input}
             placeholder="Type a message..."
-            ref={inputRef}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                handleSend()
-                inputRef.current!.value = ''
-              }
+            onChange={(e) => {
+              setInput(e.target.value)
             }}
           />
-          <button className="" onClick={() => {
-            handleSend()
-            inputRef.current!.value = ''
-          }}>Send</button>
-        </div>
+        </Box>
       </div>
-    </>
+    </div>
   )
 }
 
