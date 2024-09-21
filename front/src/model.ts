@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genai = new GoogleGenerativeAI("AIzaSyBIh_8ehl6eiYtGueW7ruejn3OtAstD5x4")
+const genai = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI as string);
 const model = genai.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" }})
 
 const extractFromInput = async (input: string, last_response: string) => {
