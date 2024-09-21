@@ -34,9 +34,9 @@ function App() {
   }, [])
 
   const handleSend = () => {
-    
+
     if (!input) return
-    const message : Message = {
+    const message: Message = {
       content: input,
       userType: 'user'
     }
@@ -44,10 +44,10 @@ function App() {
     setMessages(prev => [...prev, message])
     setInput("")
     setThinking(true);
-    
+
     extractFromInput(input, messages.map((m) => m.content))
       .then((res) => {
-        const message : Message = {
+        const message: Message = {
           content: res.response,
           userType: 'bot'
         }
@@ -61,7 +61,7 @@ function App() {
 
         setThinking(false);
       })
-    
+
   }
 
   const queryAPI = async (data: any) => {
@@ -86,10 +86,10 @@ function App() {
               {message.content}
             </div>
           })}
-          { thinking && <div className='dots'>Thinking...</div>}
+          {thinking && <div className='dots'>Thinking...</div>}
         </div>
         <Box
-          sx={{ display: "flex", width: "100%", justifyContent: "center" }}  
+          sx={{ display: "flex", width: "100%", justifyContent: "center" }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               handleSend()

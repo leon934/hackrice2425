@@ -1,0 +1,11 @@
+plan_id,name,premium,deductible,moop,network_type,urgent_care_coverage,specialist_visit_coverage,generic_drug_coverage,mental_health_outpatient_coverage,emergency_coverage,primary_care_copay,mental_health_inpatient_coverage,disease_management_count
+33602TX0461119,MyBlue Health Bronze℠ 402,691.68,7400,9450,HMO,1,1,1,1,1,1,1,8
+33602TX0461161,MyBlue Health Bronze℠ 806,697.59,7500,9400,HMO,1,1,1,1,1,1,1,8
+27248TX0010016,"Community Select Bronze 016 (No deductible for PCP & Generics, Free 24/7 Telehealth)",753.48,8100,9450,HMO,1,1,1,1,1,1,1,4
+40220TX0080032,UHC Kelsey-Seybold Bronze Copay Focus ($0 Insulin),819.32,,9450,HMO,1,1,1,1,1,1,1,0
+33602TX0461126,MyBlue Health Gold℠ 403,839.73,1000,9450,HMO,1,1,1,1,1,1,1,8
+33602TX0461168,MyBlue Health Gold℠ 808,873.99,1500,8700,HMO,1,1,1,1,1,1,1,8
+40220TX0080010,"UHC Bronze Value ($0 Virtual Urgent Care + $0 PCP Visits, $3 Tier 2 Rx, $0 Insulin)",906.59,8250,9450,HMO,1,1,1,1,1,1,1,0
+40220TX0080035,UHC Bronze Value HSA,909.44,6700,8050,HMO,1,1,1,1,1,1,1,0
+40220TX0080012,"UHC Bronze Virtual First (Unlimited $0 App-based Care, $3 Tier 2 Rx, $0 Insulin) (Disponible en espanol)",918.21,7250,9450,HMO,1,1,1,1,1,1,1,0
+20069TX0100050,Bronze Classic Standard,918.47,7500,9400,EPO,1,1,1,1,1,1,1,5
