@@ -71,8 +71,6 @@ def main():
     dataset_directory = r"C:\Users\leonl\Documents\GitHub\hackrice2425\back\insurance.csv"
 
     model, x_test, y_test = build_model(dataset_directory)
-    
-    # make_prediction(model, x_test, y_test)
 
     X_test_sample = x_test[:1]
     Y_test_sample = y_test[:1]
