@@ -38,7 +38,7 @@ function App() {
         axios.get(`https://api.mapbox.com/search/searchbox/v1/suggest?q=hospital&proximity=${position.coords.longitude},${position.coords.latitude}&limit=10&session_token=${v4()}&access_token=` + import.meta.env.VITE_MAPBOX).then((res) => {
           Promise.all(res.data.suggestions.map(async (suggestion: any) => {
             const geoloc = await axios.get(`https://api.mapbox.com/search/geocode/v6/forward?access_token=${import.meta.env.VITE_MAPBOX}&q=${suggestion["full_address"]}`)
-            return {...geoloc.data.features[0].properties.coordinates, name: suggestion.name}
+            return { ...geoloc.data.features[0].properties.coordinates, name: suggestion.name }
           })).then((res) => {
             setHospitals(res)
           })
@@ -59,7 +59,7 @@ function App() {
     setMessages(prev => [...prev, message])
     setInput("")
     setThinking(true);
-    
+
     extractFromInput(input, messages.map((m) => m.content), lastExtracted)
       .then((res) => {
         const message: Message = {

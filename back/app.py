@@ -48,6 +48,22 @@ def predict_insurance(age, sex, bmi, children, smoker, region):
     prediction = ortf.run([output_name], {input_name: iarr})[0]
     return prediction
 
+def calculate_score(predicted_price, actual_price, wp, user_need,plan_offering):
+    matches = np.logical_and(user_need, plan_offering)
+
+    match_count = np.sum(matches)
+    user_need_count = np.sum(user_need)
+
+    if user_need_count == 0:
+        coverage_alignment = 1
+    else:
+        coverage_alignment = match_count / user_need_count
+    wc = 1 - wp
+    price_deviation = abs(actual_price - predicted_price) / predicted_price
+    score = wc * price_deviation + (1 - wc) * coverage_alignment
+    return score
+
+
 @app.route("/")
 def index():
     return "hello world"
