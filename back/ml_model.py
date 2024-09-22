@@ -17,14 +17,13 @@ def build_model(dataset):
         print(f"Error loading dataset: {e}")
 
 
-    # Update the charges column to account for children
-    df['charges'] = df['charges'].add(df['children'].mul(df['charges'])) / 12
-
     # One-hot-encode the categorical columns
-    x = pd.get_dummies(df.iloc[:, :6], columns=['sex', 'smoker', 'region'], dtype=int)
+    x = df.iloc[:, :12]
+    x = x.drop(['ZipCode'], axis=1)
+    x = pd.get_dummies(x, columns=['Gender'])
 
     # Applying log transformation to 'charges' to reduce skewness
-    y = np.log1p(df['charges'])
+    y = np.arcsinh(df['Premium'])
 
     # Split the data into training and testing sets
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=36)
@@ -36,10 +35,8 @@ def build_model(dataset):
 
     onnx_file = to_onnx(etr, initial_types=initial_type)
 
-    print(type(onnx_file))
-
-    # with open("etr_model.onnx", "wb") as file:
-    #     file.write(onnx_file.SerializeToString())
+    with open("new_etr_model.onnx", "wb") as file:
+        file.write(onnx_file.SerializeToString())
 
     return etr, x_test, y_test
 
@@ -68,16 +65,17 @@ def test_onnx(onnx_filepath, x_test_sample):
     return prediction
 
 def main():
-    dataset_directory = "./insurance.csv"
+    dataset_directory = "./insurance_test_results_cleaned.csv"
 
     model, x_test, y_test = build_model(dataset_directory)
 
-    X_test_sample = x_test[:1]
-    Y_test_sample = y_test[:1]
+    n = 1
+    X_test_sample = x_test[n:n + 1]
+    Y_test_sample = y_test[n:n + 1]
 
     print(f"{X_test_sample}\n")
 
-    test_onnx("./etr_model.onnx", X_test_sample.to_numpy()) 
+    test_onnx("./new_etr_model.onnx", X_test_sample.to_numpy()) 
     model_prediction = make_prediction(model, X_test_sample, Y_test_sample)
     actual_prediction = Y_test_sample
 
