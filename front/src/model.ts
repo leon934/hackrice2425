@@ -39,7 +39,7 @@ const extractFromInput = async (input: string, history: string[], lastExtraction
         Return: Response = {
             extracted: Information,
             response: string (your response to the user, be helpful and friendly, stay aware of what they're saying),
-            valid: boolean (when all the required fields are answered, it is true)
+            valid: boolean (when all the required fields are answered, it is true, inform the user that it is in progress)
         }
 
     `;

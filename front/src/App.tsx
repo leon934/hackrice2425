@@ -29,6 +29,9 @@ function App() {
   const [radius, setRadius] = useState<number>(5)
   const [_, setPredicted] = useState<number>(0)
 
+  const startButton = document.getElementById('startButton');
+  const outputDiv = document.getElementById('output');
+
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
       setUserLocation({ lat: position.coords.latitude, long: position.coords.longitude })
@@ -90,9 +93,8 @@ function App() {
   return (
     <div style={{ display: "flex", overflow: "hidden" }}>
       <div style={{ width: "75vw", height: "100vh" }}>{userLocation && hospitals && <MapComponent radiusInKm={radius} lat={userLocation.lat} long={userLocation.long} hospitals={hospitals} />}</div>
-      <div> <SearchBarComponent /></div>
       <div style={{ width: "25vw", height: "100vh" }}>
-        <h1>Insurance</h1>
+        <h1>MedSure</h1>
         <div className="chat-container">
           {messages.map((message, index) => {
             return <div
@@ -131,6 +133,7 @@ function App() {
         </Box>
         <div style={{ display: "flex", justifyContent: "center", padding: "40px 0" }}>
           <div style={{ width: "60%", display: "flex", flexDirection: "column" }}>
+            <h2>Radius</h2>
               <Slider value={radius} step={0.0001} min={2} max={45} onChange={(_, val) => {
                 setRadius(val as number)
                 console.log(val)
