@@ -1,5 +1,5 @@
 import ReactMapGL, { Marker, Popup, Source, Layer } from 'react-map-gl';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FeatureCollection } from "geojson"
 import { Card, Typography, Box, CardContent, Divider,Button, CardActions } from '@mui/material';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -52,7 +52,7 @@ const MapComponent = ({lat, long, hospitals, radiusInKm} : any) => {
     const [showFloat, setShowFloat] = useState(false)
     const [viewing, setViewing] = useState<any>(null)
 
-    function getDistance(lat1,lon1,lat2,lon2) {
+    function getDistance(lat1: number,lon1: number,lat2: number,lon2: number) {
         var R = 6371; // Radius of the earth in km
         var dLat = deg2rad(lat2-lat1);  // deg2rad below
         var dLon = deg2rad(lon2-lon1); 
@@ -67,7 +67,7 @@ const MapComponent = ({lat, long, hospitals, radiusInKm} : any) => {
         return d;
     }
         
-    function deg2rad(deg) {
+    function deg2rad(deg: number) {
         return deg * (Math.PI/180)
     }
 

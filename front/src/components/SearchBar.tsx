@@ -1,7 +1,6 @@
-import React, {useEffect, useState, ChangeEvent} from "react";
+import {useState} from "react";
 import {FaSearch} from "react-icons/fa";
 import "./SearchBar.css";
-import axios from "axios";
 
 const SearchBarComponent = () => {
     const [input, setInput] = useState("")
