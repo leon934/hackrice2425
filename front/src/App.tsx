@@ -6,6 +6,8 @@ import MapComponent from './components/Map'
 import SearchBarComponent from './components/SearchBar'
 import { Box, Button, Input } from "@mui/joy"
 import { v4 } from 'uuid'
+import SendIcon from '@mui/icons-material/Send';
+import {Slider} from '@mui/material';
 
 type Message = {
   content: string
@@ -27,6 +29,7 @@ function App() {
   const [zipCode, setZipCode] = useState<string>("")
   const [hospitals, setHospitals] = useState<any[]>([])
   const [ran, setRan] = useState<boolean>(false)
+  const [radius, setRadius] = useState<number>(0)
 
   useEffect(() => {
     if (ran) return
@@ -89,7 +92,7 @@ function App() {
 
   return (
     <div style={{ display: "flex", overflow: "hidden" }}>
-      <div style={{ width: "75vw", height: "100vh" }}>{userLocation && hospitals && <MapComponent lat={userLocation.lat} long={userLocation.long} hospitals={hospitals} />}</div>
+      <div style={{ width: "75vw", height: "100vh" }}>{userLocation && hospitals && <MapComponent radiusInKm={radius} lat={userLocation.lat} long={userLocation.long} hospitals={hospitals} />}</div>
       <div> <SearchBarComponent /></div>
       <div style={{ width: "25vw", height: "100vh" }}>
         <h1>Insurance</h1>
@@ -107,15 +110,16 @@ function App() {
         <Box
           sx={{ display: "flex", width: "100%", justifyContent: "center" }}
           onKeyDown={(e) => {
+            if (thinking) return
             if (e.key === 'Enter') {
               handleSend()
             }
           }}
         >
           <Input
-            endDecorator={<Button onClick={() => {
+            endDecorator={<Button disabled={thinking} onClick={() => {
               handleSend()
-            }}>Send</Button>}
+            }}><SendIcon /></Button>}
             sx={{
               width: "80%",
             }}
@@ -128,6 +132,15 @@ function App() {
             }}
           />
         </Box>
+        <div style={{ display: "flex", justifyContent: "center", padding: "40px 0" }}>
+          <div style={{ width: "60%", display: "flex", flexDirection: "column" }}>
+              <Slider value={radius} step={0.0001} max={45} onChange={(_, val) => {
+                setRadius(val as number)
+                console.log(val)
+              }}></Slider>
+              <Slider></Slider>
+          </div>
+        </div>
       </div>
     </div>
   )

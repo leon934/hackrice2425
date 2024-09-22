@@ -1,8 +1,25 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-
+import { HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
 
 const genai = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI as string);
-const model = genai.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" }})
+const model = genai.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" }, safetySettings: [
+    {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE
+    },
+    {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE
+    },
+    {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_NONE
+    },
+    {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_NONE
+    }
+]})
 
 const extractFromInput = async (input: string, history: string[], lastExtraction: string) => {
 
@@ -29,7 +46,7 @@ const extractFromInput = async (input: string, history: string[], lastExtraction
 
     `;
 
-    const res = await model.generateContent(prompt);
+    const res = await model.generateContent(prompt)
 
     console.log((res.response.text()));
 
