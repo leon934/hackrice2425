@@ -1,16 +1,16 @@
-import Map, {Marker} from 'react-map-gl';
-import { useEffect, useRef } from 'react';
+import ReactMapGL, {Marker, Popup} from 'react-map-gl';
+import React, { useMemo } from 'react';
 
 const MapComponent = ({lat, long, hospitals} : any) => {
+    
 
-    const mapRef = useRef(null);
+    const render = useMemo(() => {
+        console.log(hospitals)
+        return hospitals.map((hospital: any, index: number) => <Popup key={index} latitude={hospital.latitude} longitude={hospital.longitude} anchor="bottom" style={{ color: "black" }} closeOnClick={false}><h5>{hospital.name}</h5></Popup>)
+    }, [hospitals])
 
-    useEffect(() => {
-        // Redraw map when component is mounted
 
-    }, [hospitals]);
-
-    return <Map 
+    return <ReactMapGL
         mapLib={import('mapbox-gl')}
         initialViewState={{
             longitude: long,
@@ -20,12 +20,11 @@ const MapComponent = ({lat, long, hospitals} : any) => {
         }}
         style={{width: "100%", height: "100%"}}
         mapboxAccessToken={import.meta.env.VITE_MAPBOX as string}
-        mapStyle={"mapbox://styles/mapbox/streets-v9"}
-        ref={mapRef}
-    >   
+        mapStyle={"mapbox://styles/mapbox/streets-v11"}
+    >    
+        {render}
         <Marker latitude={lat} longitude={long} color="red" />
-        {hospitals.map((hospital: any) => <Marker latitude={hospital.latitude} longitude={hospital.longitude} color="blue" />)}
-    </Map>
+    </ReactMapGL>
 };
 
 export default MapComponent;

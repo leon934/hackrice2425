@@ -26,23 +26,21 @@ function App() {
   const [userLocation, setUserLocation] = useState<Location | null>(null)
   const [zipCode, setZipCode] = useState<string>("")
   const [hospitals, setHospitals] = useState<any[]>([])
-  const [rendering, setRendering] = useState<boolean>(true)
+  const [ran, setRan] = useState<boolean>(false)
 
   useEffect(() => {
-    console.log(import.meta.env)
+    if (ran) return
+    setRan(true)
     navigator.geolocation.getCurrentPosition((position) => {
       setUserLocation({ lat: position.coords.latitude, long: position.coords.longitude })
       axios.get(`https://api.mapbox.com/search/geocode/v6/reverse?longitude=${position.coords.longitude}&latitude=${position.coords.latitude}&access_token=${import.meta.env.VITE_MAPBOX}`).then((res) => {
         setZipCode(res.data.features[0].properties.context.postcode.name)
         axios.get(`https://api.mapbox.com/search/searchbox/v1/suggest?q=hospital&proximity=${position.coords.longitude},${position.coords.latitude}&limit=10&session_token=${v4()}&access_token=` + import.meta.env.VITE_MAPBOX).then((res) => {
-          setRendering(true)
           Promise.all(res.data.suggestions.map(async (suggestion: any) => {
-            if (!suggestion.context) return
-            const geoloc = await axios.get(`https://api.mapbox.com/search/geocode/v6/forward?q=${suggestion.context["full_address"]}&access_token=${import.meta.env.VITE_MAPBOX}`)
+            const geoloc = await axios.get(`https://api.mapbox.com/search/geocode/v6/forward?access_token=${import.meta.env.VITE_MAPBOX}&q=${suggestion["full_address"]}`)
             return {...geoloc.data.features[0].properties.coordinates, name: suggestion.name}
           })).then((res) => {
             setHospitals(res)
-            setRendering(false)
           })
         })
       })
@@ -91,7 +89,7 @@ function App() {
 
   return (
     <div style={{ display: "flex", overflow: "hidden" }}>
-      <div style={{ width: "75vw", height: "100vh" }}>{userLocation && !rendering && <MapComponent lat={userLocation.lat} long={userLocation.long} hospitals={hospitals} />}</div>
+      <div style={{ width: "75vw", height: "100vh" }}>{userLocation && hospitals && <MapComponent lat={userLocation.lat} long={userLocation.long} hospitals={hospitals} />}</div>
       <div> <SearchBarComponent /></div>
       <div style={{ width: "25vw", height: "100vh" }}>
         <h1>Insurance</h1>
