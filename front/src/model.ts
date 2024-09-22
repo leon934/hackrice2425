@@ -28,8 +28,6 @@ const extractFromInput = async (input: string, history: string[], lastExtraction
         Information = {
             age: number, required,
             gender: boolean, required (true for male or false for female)
-            weight: number, required (convert to kilograms)
-            height: number, required (convert to meters)
             dependents: number, required
             income: number, required
             smoker: boolean, required

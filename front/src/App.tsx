@@ -28,24 +28,15 @@ function App() {
   const [userLocation, setUserLocation] = useState<Location | null>(null)
   const [zipCode, setZipCode] = useState<string>("")
   const [hospitals, setHospitals] = useState<any[]>([])
-  const [ran, setRan] = useState<boolean>(false)
-  const [radius, setRadius] = useState<number>(0)
+  const [radius, setRadius] = useState<number>(5)
+  const [data, setData] = useState<any>([])
+  const [predicted, setPredicted] = useState<number>(0)
 
   useEffect(() => {
-    if (ran) return
-    setRan(true)
     navigator.geolocation.getCurrentPosition((position) => {
       setUserLocation({ lat: position.coords.latitude, long: position.coords.longitude })
       axios.get(`https://api.mapbox.com/search/geocode/v6/reverse?longitude=${position.coords.longitude}&latitude=${position.coords.latitude}&access_token=${import.meta.env.VITE_MAPBOX}`).then((res) => {
         setZipCode(res.data.features[0].properties.context.postcode.name)
-        axios.get(`https://api.mapbox.com/search/searchbox/v1/suggest?q=hospital&proximity=${position.coords.longitude},${position.coords.latitude}&limit=10&session_token=${v4()}&access_token=` + import.meta.env.VITE_MAPBOX).then((res) => {
-          Promise.all(res.data.suggestions.map(async (suggestion: any) => {
-            const geoloc = await axios.get(`https://api.mapbox.com/search/geocode/v6/forward?access_token=${import.meta.env.VITE_MAPBOX}&q=${suggestion["full_address"]}`)
-            return { ...geoloc.data.features[0].properties.coordinates, name: suggestion.name }
-          })).then((res) => {
-            setHospitals(res)
-          })
-        })
       })
     });
 
@@ -85,9 +76,18 @@ function App() {
   const queryAPI = async (data: any) => {
     axios.post('http://localhost:5000/api/insuranceRequest', data)
       .then((res) => {
-        console.log(res.data)
-      })
+        setPredicted(res.data["predicted_price"])
+        Promise.all(res.data["data"].map(async (hospital: any) => {
+          const response = await axios.get(`https://api.mapbox.com/search/geocode/v6/forward?q=${hospital[13]}&access_token=${import.meta.env.VITE_MAPBOX as string}`)
 
+          console.log(response.data)
+
+          return { "latitude": response.data.features[0].properties.coordinates.latitude, "longitude": response.data.features[0].properties.coordinates.longitude, "row": hospital, "name": hospital[13] }
+        })).then((res) => {
+          console.log(res)
+          setHospitals(res)
+        })
+      })
   }
 
   return (
@@ -134,11 +134,10 @@ function App() {
         </Box>
         <div style={{ display: "flex", justifyContent: "center", padding: "40px 0" }}>
           <div style={{ width: "60%", display: "flex", flexDirection: "column" }}>
-              <Slider value={radius} step={0.0001} max={45} onChange={(_, val) => {
+              <Slider value={radius} step={0.0001} min={2} max={45} onChange={(_, val) => {
                 setRadius(val as number)
                 console.log(val)
               }}></Slider>
-              <Slider></Slider>
           </div>
         </div>
       </div>
