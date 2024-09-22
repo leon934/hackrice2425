@@ -29,8 +29,8 @@ function App() {
   const [radius, setRadius] = useState<number>(5)
   const [_, setPredicted] = useState<number>(0)
 
-  const startButton = document.getElementById('startButton');
-  const outputDiv = document.getElementById('output');
+  // const startButton = document.getElementById('startButton');
+  // const outputDiv = document.getElementById('output');
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
