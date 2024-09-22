@@ -1,3 +1,3 @@
-Project: Insurance Recommendation System
+# Project: Insurance Recommendation System
 
-By: Leon Nguyen, Pranjal Ghimire, Hung Bui, Conan Nguyen
+By: Leon Nguyen, Hung Bui, Conan Nguyen
