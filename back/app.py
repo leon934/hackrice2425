@@ -8,6 +8,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 import os
 import json
+import pandas as pd
 
 app = Flask(__name__)
 
@@ -73,21 +74,28 @@ def insuranceRequest():
 
     input_data = request.json
 
-
-    res = requests.get(f"https://us-zipcode.api.smarty.com/lookup?auth-id=3e85486c-0bf0-58c6-bc58-285fd49fc589&zipcode={input_data.get("zipCode")}&auth-token=SDDsxsqYifk9rBLERYRE")
-
-    zip_data = res.json()[0]
+    def get_zip_data():
+            res = requests.get(f"https://us-zipcode.api.smarty.com/lookup?auth-id=7137fd41-70ad-59cb-9d17-650cfb93946b&zipcode={input_data.get('zipCode')}&auth-token=1bosOieBykQ7fmiFf2RW")
+            if res.status_code == 200 and res.json():
+                return res
+            return get_zip_data()
+    
+    zip_data = get_zip_data().json()[0]
 
     res = query_insurance(input_data.get("income"), input_data.get("gender"), input_data.get("age"), zip_data.get("zipcodes")[0], input_data.get("smoker", False), input_data.get("pregnant", False), input_data.get("dependents") != 0, input_data.get("married", False))
 
-    model_response = model.generate_content("Given this city and state, catergorize whether this location is 'northeast', 'northwest', 'southeast', or 'southwest' of the US. Output it with this json format: {'region': one of the four regions}")
+    # model_response = model.generate_content("Given this city and state, catergorize whether this location is 'northeast', 'northwest', 'southeast', or 'southwest' of the US. Output it with this json format: {'region': one of the four regions}")
 
-    region = json.loads(model_response.text)["region"]
-    bmi = float(input_data.get("weight")) / float(input_data.get("height")) ** 2 
+    # region = json.loads(model_response.text)["region"]
 
-    print(predict_insurance(input_data.get("age"), input_data.get('gender'), bmi, input_data.get('dependents'), input_data.get('smoker'), region))
+    # print(predict_insurance(input_data.get("age"), input_data.get('gender'), bmi, input_data.get('dependents'), input_data.get('smoker'), region))
 
-    return jsonify(res)
+    predicted_price = 0
+    data = pd.read_csv("hospital.csv").to_records()
+    return {
+        "predicted_price": predicted_price,
+        "data": data.tolist()
+    }
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
