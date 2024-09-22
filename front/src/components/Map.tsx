@@ -105,17 +105,16 @@ const MapComponent = ({lat, long, hospitals, radiusInKm} : any) => {
         };
     }, [radiusInKm])
 
-    const layerStyle: mapboxgl.Layer = {
-        id: "polygon",
-        type: "fill", // "fill" is a valid layer type
-        source: "polygon", // Source should match the "id" of the source
-        layout: {}, // Empty layout is fine
-        paint: {
+    const layerStyle = {
+        "id": "polygon",
+        "type": "fill",
+        "source": "polygon",
+        "layout": {},
+        "paint": {
             "fill-color": "blue",
             "fill-opacity": 0.6
         }
     };
-    
 
     const render = useMemo(() => {
         return hospitals.map((hospital: any, index: number) => {
