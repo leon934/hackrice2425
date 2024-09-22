@@ -1,11 +1,9 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import { extractFromInput } from './model'
 import axios from 'axios';
 import MapComponent from './components/Map'
-import SearchBarComponent from './components/SearchBar'
 import { Box, Button, Input } from "@mui/joy"
-import { v4 } from 'uuid'
 import SendIcon from '@mui/icons-material/Send';
 import {Slider} from '@mui/material';
 
@@ -29,8 +27,7 @@ function App() {
   const [zipCode, setZipCode] = useState<string>("")
   const [hospitals, setHospitals] = useState<any[]>([])
   const [radius, setRadius] = useState<number>(5)
-  const [data, setData] = useState<any>([])
-  const [predicted, setPredicted] = useState<number>(0)
+  const [_, setPredicted] = useState<number>(0)
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {

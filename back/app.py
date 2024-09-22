@@ -84,18 +84,76 @@ def insuranceRequest():
 
     res = query_insurance(input_data.get("income"), input_data.get("gender"), input_data.get("age"), zip_data.get("zipcodes")[0], input_data.get("smoker", False), input_data.get("pregnant", False), input_data.get("dependents") != 0, input_data.get("married", False))
 
-    # model_response = model.generate_content("Given this city and state, catergorize whether this location is 'northeast', 'northwest', 'southeast', or 'southwest' of the US. Output it with this json format: {'region': one of the four regions}")
-
-    # region = json.loads(model_response.text)["region"]
-
-    # print(predict_insurance(input_data.get("age"), input_data.get('gender'), bmi, input_data.get('dependents'), input_data.get('smoker'), region))
-
     predicted_price = 0
     data = pd.read_csv("hospital.csv").to_records()
     return {
         "predicted_price": predicted_price,
         "data": data.tolist()
     }
+
+@app.route("/hospitalRanking", methods=["GET"])
+def hospitalRanking():
+    input_data = request.json
+
+    # Example usage
+    predicted_price = 100  # Example predicted price
+    insurance_prices = [90, 110, 95]  # Example insurance prices
+    weight_price = 0.3  # Example weight for price
+
+    # Example dataset will just consist of True, False, True, ...
+    user_req_coverage = [True, False, True, False, True, False, True, False]
+    insurance_coverage = [
+        [True, False, True, False, True, False, True, False],
+        [True, False, True, False, True, False, True, False],
+        [True, False, True, False, True, False, True, False]
+    ]
+
+    # This will be equal to the size of insurance_coverage.
+    insurance_prices = []
+
+    def convert_to_deviation(insurance_prices, predicted_price):
+        # Finds the deviations of all the prices from the inputted predicted price.
+        deviations = [abs(price - predicted_price) for price in insurance_prices]
+
+        min_deviation = min(deviations)
+        max_deviation = max(deviations)
+
+        normalized_deviations = [(deviation - min_deviation) / (max_deviation - min_deviation) for deviation in deviations]
+        
+        return normalized_deviations
+
+    # TODO: find the deviations from the predicted budget and normalize all of the values.
+    def calculate_match(user_req_coverage, insurance_coverage, weight_price, predicted_price, insurance_prices):
+        total = 0
+        percentage_array = []
+
+        # The weights sum up to 1.
+        weight_coverage = 1 - weight_price
+
+        # Normalize the price deviations
+        normalized_deviations = convert_to_deviation(insurance_prices, predicted_price)
+
+        # To find the coverage percentage.
+        for i in range(len(insurance_coverage)):
+            for j in range(len(user_req_coverage)):
+                if user_req_coverage[j] == insurance_coverage[i][j]:
+                    total += 1
+
+            # Adds the weight of the coverage times the percentage of overlapping coverage.
+            coverage_percentage = weight_coverage * total / len(user_req_coverage)
+            total = 0
+        
+            # Adds the weight of the price.
+            price_weighted = weight_price * normalized_deviations[i]
+            percentage_array.append(coverage_percentage + price_weighted)
+
+        # Finds the highest value in the array with all of the values.
+        highest = max(percentage_array)
+
+        return highest
+
+    highest_match = calculate_match(user_req_coverage, insurance_coverage, weight_price, predicted_price, insurance_prices)
+    print(highest_match)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
